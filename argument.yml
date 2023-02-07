@@ -5,7 +5,7 @@ MiDaS_model_ckpt: MiDaS/model.pt
 use_boostmonodepth: True
 fps: 48
 num_frames: 48
-x_shift_range: [-0.03]
+x_shift_range: [-0.08]
 y_shift_range: [0.00]
 z_shift_range: [0.00]
 traj_types: ['straight-line']
