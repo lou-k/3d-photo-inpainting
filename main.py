@@ -22,13 +22,16 @@ from bilateral_filtering import sparse_bilateral_filtering
 parser = argparse.ArgumentParser()
 parser.add_argument('--config', type=str, default='argument.yml',help='Configure of post processing')
 parser.add_argument('--src_folder', type=str, help='Input image directory')
+parser.add_argument('--video_folder', type=str, help='Output video directory')
 args = parser.parse_args()
 config = yaml.safe_load(open(args.config, 'r'))
 src_folder = args.src_folder or config['src_folder']
+video_folder = args.video_folder or config['video_folder']
+
 if config['offscreen_rendering'] is True:
     vispy.use(app='egl')
 os.makedirs(config['mesh_folder'], exist_ok=True)
-os.makedirs(config['video_folder'], exist_ok=True)
+os.makedirs(video_folder, exist_ok=True)
 os.makedirs(config['depth_folder'], exist_ok=True)
 sample_list = get_MiDaS_samples(src_folder, config['depth_folder'], config, config['specific'])
 normal_canvas, all_canvas = None, None
@@ -133,7 +136,7 @@ for idx in tqdm(range(len(sample_list))):
     down, right = top + config['output_h'], left + config['output_w']
     border = [int(xx) for xx in [top, down, left, right]]
     normal_canvas, all_canvas = output_3d_photo(verts.copy(), colors.copy(), faces.copy(), copy.deepcopy(Height), copy.deepcopy(Width), copy.deepcopy(hFov), copy.deepcopy(vFov),
-                        copy.deepcopy(sample['tgt_pose']), sample['video_postfix'], copy.deepcopy(sample['ref_pose']), copy.deepcopy(config['video_folder']),
+                        copy.deepcopy(sample['tgt_pose']), sample['video_postfix'], copy.deepcopy(sample['ref_pose']), copy.deepcopy(video_folder),
                         image.copy(), copy.deepcopy(sample['int_mtx']), config, image,
                         videos_poses, video_basename, config.get('original_h'), config.get('original_w'), border=border, depth=depth, normal_canvas=normal_canvas, all_canvas=all_canvas,
                         mean_loc_depth=mean_loc_depth)
