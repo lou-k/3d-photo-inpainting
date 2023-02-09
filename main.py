@@ -23,17 +23,19 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--config', type=str, default='argument.yml',help='Configure of post processing')
 parser.add_argument('--src_folder', type=str, help='Input image directory')
 parser.add_argument('--video_folder', type=str, help='Output video directory')
+parser.add_argument('--depth_folder', type=str, help='Output depth directory')
 args = parser.parse_args()
 config = yaml.safe_load(open(args.config, 'r'))
 src_folder = args.src_folder or config['src_folder']
 video_folder = args.video_folder or config['video_folder']
+depth_folder = args.depth_folder or config['depth_folder']
 
 if config['offscreen_rendering'] is True:
     vispy.use(app='egl')
 os.makedirs(config['mesh_folder'], exist_ok=True)
 os.makedirs(video_folder, exist_ok=True)
-os.makedirs(config['depth_folder'], exist_ok=True)
-sample_list = get_MiDaS_samples(src_folder, config['depth_folder'], config, config['specific'])
+os.makedirs(depth_folder, exist_ok=True)
+sample_list = get_MiDaS_samples(src_folder, depth_folder, config, config['specific'])
 normal_canvas, all_canvas = None, None
 
 if isinstance(config["gpu_ids"], int) and (config["gpu_ids"] >= 0):
@@ -52,9 +54,9 @@ for idx in tqdm(range(len(sample_list))):
 
     print(f"Running depth extraction at {time.time()}")
     if config['use_boostmonodepth'] is True:
-        run_boostmonodepth(sample['ref_img_fi'], src_folder, config['depth_folder'])
+        run_boostmonodepth(sample['ref_img_fi'], src_folder, depth_folder)
     elif config['require_midas'] is True:
-        run_depth([sample['ref_img_fi']], src_folder, config['depth_folder'],
+        run_depth([sample['ref_img_fi']], src_folder, depth_folder,
                   config['MiDaS_model_ckpt'], MonoDepthNet, MiDaS_utils, target_w=640)
 
     if 'npy' in config['depth_format']:
