@@ -56,14 +56,15 @@ for idx in tqdm(range(len(sample_list))):
     if config['use_boostmonodepth'] is True:
         run_boostmonodepth(sample['ref_img_fi'], src_folder, depth_folder)
     elif config['require_midas'] is True:
+        image_width = image.shape[1]
         run_depth([sample['ref_img_fi']], src_folder, depth_folder,
-                  config['MiDaS_model_ckpt'], MonoDepthNet, MiDaS_utils, target_w=640)
+                  config['MiDaS_model_ckpt'], MonoDepthNet, MiDaS_utils, target_w=image_width)
 
     if 'npy' in config['depth_format']:
         config['output_h'], config['output_w'] = np.load(sample['depth_fi']).shape[:2]
     else:
         config['output_h'], config['output_w'] = imageio.imread(sample['depth_fi']).shape[:2]
-    frac = config['longer_side_len'] / max(config['output_h'], config['output_w'])
+    frac = 1
     config['output_h'], config['output_w'] = int(config['output_h'] * frac), int(config['output_w'] * frac)
     config['original_h'], config['original_w'] = config['output_h'], config['output_w']
     if image.ndim == 2:
